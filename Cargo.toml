@@ -1,0 +1,18 @@
+[package]
+name = "http-proxy"
+edition = "2021"
+version = "0.1.0"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+matchit = "0.9.0"
+serde = { version = "1.0.225", features = ["derive"] }
+serde_json = "1.0.145"
+wasmcloud-component = "0.2.0"
+wit-bindgen = "0.46"
+waki = "0.5.1"
+

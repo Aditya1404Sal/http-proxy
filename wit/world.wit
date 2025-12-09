@@ -1,0 +1,6 @@
+package betty-blocks:http-wrapper;
+
+world main {
+   import wasmcloud:ai/streaming-handler;
+   export wasi:http/incoming-handler@0.2.2;
+}

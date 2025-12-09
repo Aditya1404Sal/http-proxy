@@ -1,0 +1,18 @@
+package wasmcloud:ai;
+
+interface streaming-handler {
+  use wasi:http/types@0.2.2.{incoming-request, response-outparam};
+
+  stream-handle: func(request: incoming-request, response: response-outparam);
+}
+
+world ai {
+  import wasi:io/poll@0.2.2;
+  import wasi:clocks/monotonic-clock@0.2.2;
+  import wasi:io/error@0.2.2;
+  import wasi:io/streams@0.2.2;
+  import wasi:http/types@0.2.2;
+  import wasi:http/outgoing-handler@0.2.2;
+
+  export streaming-handler;
+}
