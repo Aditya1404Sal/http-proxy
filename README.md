@@ -1,6 +1,6 @@
-# MCP Wrapper
+# HTTP Proxy for OpenAI
 
-This is a HTTP component that wraps and routes requests to an MCP (Model Context Protocol) component. It provides HTTP routing for health checks, actions, and MCP protocol handling.
+This is an HTTP component that wraps and routes requests to an OpenAI streaming component. It provides HTTP routing and proxies streaming responses from the OpenAI API.
 
 ## Prerequisites
 
@@ -14,11 +14,26 @@ This is a HTTP component that wraps and routes requests to an MCP (Model Context
 wash build
 ```
 
+## Composing with OpenAI Component
+
+This proxy component needs to be composed with the OpenAI component:
+
+```bash
+wac plug ./build/http_proxy.wasm --plug ../openai-component/build/openai_component.wasm -o final.wasm
+```
+
+## Running with Wasmtime
+
+Set your OpenAI API key and run the composed component:
+
+```bash
+export OPENAI_API_KEY='api_key'
+wasmtime serve -Scommon -Sinherit-env=y ./final.wasm
+```
+
 ## Routes
 
-- `GET /health` - Health check endpoint
-- `POST /actions` - Actions endpoint (Betty Blocks integration - currently mocked)
-- `POST /mcp` - MCP protocol endpoint (delegates to MCP component)
+- `POST /openai-proxy` - OpenAI proxy endpoint (delegates to OpenAI component)
 
 ## Running with wasmCloud
 
@@ -26,15 +41,11 @@ wash build
 wash dev
 ```
 
-Test the endpoints - see [Testing.md](./Testing.md) for detailed testing instructions.
-
 ## Architecture
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architecture documentation.
-
-This component acts as an HTTP router that:
-- Handles basic HTTP routes (health, actions)
-- Delegates MCP protocol requests to an imported MCP component via WIT bindings
+This component acts as an HTTP proxy that:
+- Receives HTTP requests with text prompts
+- Delegates streaming requests to the OpenAI component via WIT bindings
 - Uses the WASI HTTP interface for protocol-level request/response handling
 
 ## Adding Capabilities
