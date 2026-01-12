@@ -21,6 +21,8 @@ impl Guest for Component {
     }
 }
 
+bindings::export!(Component with_types_in bindings);
+
 fn handle_request(request: IncomingRequest, response_out: ResponseOutparam) {
     let headers = request.headers().entries();
 
@@ -38,7 +40,17 @@ fn handle_request(request: IncomingRequest, response_out: ResponseOutparam) {
             match extract_prompt_from_request(&request) {
                 Ok(prompt) => {
                     eprintln!("[PROXY] Extracted prompt: {}", prompt);
-                    streaming_handler::stream_handle(&prompt, response_out);
+
+                    // Call the streaming handler and get the complete response
+                    let response_text = streaming_handler::prompt_handle(&prompt);
+
+                    eprintln!(
+                        "[PROXY] Got response from streaming handler: {} bytes",
+                        response_text.len()
+                    );
+
+                    // Send the response back to the client
+                    send_text_response(response_out, 200, response_text);
                 }
                 Err(e) => {
                     eprintln!("[PROXY] Failed to extract prompt: {}", e);
@@ -78,6 +90,37 @@ fn extract_prompt_from_request(request: &IncomingRequest) -> Result<String, Stri
     String::from_utf8(prompt_bytes).map_err(|e| format!("Invalid UTF-8: {}", e))
 }
 
+fn send_text_response(response_out: ResponseOutparam, status: u16, text: String) {
+    let headers = Fields::new();
+    headers
+        .append(&"content-type".to_string(), &b"text/plain".to_vec())
+        .expect("failed to append content-type header");
+
+    let response = OutgoingResponse::new(headers);
+    response
+        .set_status_code(status)
+        .expect("setting status code");
+
+    let body = response.body().expect("response should be writable");
+
+    ResponseOutparam::set(response_out, Ok(response));
+
+    let output_stream = body.write().expect("body should be writable");
+    
+    // Write in chunks of 4096 bytes (the max for blocking_write_and_flush)
+    let bytes = text.as_bytes();
+    const CHUNK_SIZE: usize = 4096;
+    
+    for chunk in bytes.chunks(CHUNK_SIZE) {
+        output_stream
+            .blocking_write_and_flush(chunk)
+            .expect("failed to write response body chunk");
+    }
+
+    drop(output_stream);
+    OutgoingBody::finish(body, None).expect("outgoing-body.finish");
+}
+
 fn bad_request(response_out: ResponseOutparam) {
     respond(400, response_out)
 }
@@ -98,5 +141,3 @@ fn respond(status: u16, response_out: ResponseOutparam) {
 
     OutgoingBody::finish(body, None).expect("outgoing-body.finish");
 }
-
-bindings::export!(Component with_types_in bindings);

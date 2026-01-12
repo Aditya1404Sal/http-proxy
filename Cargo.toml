@@ -13,6 +13,6 @@ matchit = "0.9.0"
 serde = { version = "1.0.225", features = ["derive"] }
 serde_json = "1.0.145"
 wasmcloud-component = "0.2.0"
-wit-bindgen = "0.46"
+wit-bindgen = "0.47"
 waki = "0.5.1"
 

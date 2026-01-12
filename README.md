@@ -45,7 +45,7 @@ wash dev
 
 This component acts as an HTTP proxy that:
 - Receives HTTP requests with text prompts
-- Delegates streaming requests to the OpenAI component via WIT bindings
+- Delegates prompt to the OpenAI component via WIT bindings
 - Uses the WASI HTTP interface for protocol-level request/response handling
 
 ## Adding Capabilities
