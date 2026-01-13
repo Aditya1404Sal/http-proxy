@@ -1,6 +1,6 @@
 package wasmcloud:ai;
 
-interface streaming-handler {
+interface response-handler {
   prompt-handle: func(prompt: string) -> string;
 }
 
@@ -13,5 +13,5 @@ world ai {
   import wasi:http/outgoing-handler@0.2.2;
   import wasi:cli/environment@0.2.2;
 
-  export streaming-handler;
+  export response-handler;
 }

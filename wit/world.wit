@@ -1,6 +1,6 @@
 package wasmcloud:http-wrapper;
 
 world main {
-   import wasmcloud:ai/streaming-handler;
+   import wasmcloud:ai/response-handler;
    export wasi:http/incoming-handler@0.2.2;
 }

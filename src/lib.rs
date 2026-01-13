@@ -10,7 +10,7 @@ use bindings::{
         Fields, IncomingRequest, Method, OutgoingBody, OutgoingResponse, ResponseOutparam,
     },
     wasi::io::streams::StreamError,
-    wasmcloud::ai::streaming_handler,
+    wasmcloud::ai::response_handler,
 };
 
 struct Component;
@@ -42,7 +42,7 @@ fn handle_request(request: IncomingRequest, response_out: ResponseOutparam) {
                     eprintln!("[PROXY] Extracted prompt: {}", prompt);
 
                     // Call the streaming handler and get the complete response
-                    let response_text = streaming_handler::prompt_handle(&prompt);
+                    let response_text = response_handler::prompt_handle(&prompt);
 
                     eprintln!(
                         "[PROXY] Got response from streaming handler: {} bytes",
